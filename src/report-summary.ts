@@ -36,10 +36,12 @@ export const reportSummary = async (result: RspecResult): Promise<void> => {
 
   const hideFooterLink = core.getInput('hideFooterLink') === 'true'
 
-  await core.summary
-    .addHeading('RSpec Result')
+  const summaryBuilder = core.summary
+    .addHeading('RSpec Result', 2)
     .addRaw(summary)
-    .addTable([
+
+  if (rows.length > 0) {
+    summaryBuilder.addTable([
       [
         {data: 'Example :link:', header: true},
         {data: 'Description :pencil2:', header: true},
@@ -47,6 +49,7 @@ export const reportSummary = async (result: RspecResult): Promise<void> => {
       ],
       ...rows
     ])
-    .addRaw(hideFooterLink ? '' : `\n${FOOTER_LINK}`)
-    .write()
+  }
+
+  await summaryBuilder.addRaw(hideFooterLink ? '' : `\n${FOOTER_LINK}`).write()
 }
