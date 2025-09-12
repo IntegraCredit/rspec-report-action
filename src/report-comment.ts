@@ -14,13 +14,14 @@ export async function examples2Table(
   examples: RspecResult['examples']
 ): Promise<string> {
   const {markdownTable} = await import('markdown-table')
+  const baseUrl = `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/blob/${github.context.sha}`
 
   return markdownTable([
     ['Example', 'Description', 'Message'],
     ...examples
       .slice(0, MAX_TABLE_ROWS)
       .map(({filePath, lineNumber, description, message}) => [
-        [filePath, lineNumber].join(':'),
+        `[${filePath}:${lineNumber}](${baseUrl}/${filePath}#L${lineNumber})`,
         description,
         truncate(message, MAX_MESSAGE_LENGTH)
           .replace(/\\n/g, ' ')
@@ -55,17 +56,27 @@ export const reportComment = async (result: RspecResult): Promise<void> => {
   const title = core.getInput('title', {required: true})
 
   if (result.success) {
-    await deleteComment({
-      ...commentGeneralOptions(),
-      body: title,
-      startsWith: true
-    })
-    return
-  }
+    const icon = result.success ? ':tada:' : ':cold_sweat:'
+    const summary = `${icon} ${result.summary}`
 
-  await replaceComment({
-    ...commentGeneralOptions(),
-    body: `${title}
+    if (core.getBooleanInput('reportOnSuccess', {required: true})) {
+      await replaceComment({
+        ...commentGeneralOptions(),
+        body: `${title}
+${summary}
+`
+      })
+    } else {
+      await deleteComment({
+        ...commentGeneralOptions(),
+        body: title,
+        startsWith: true
+      })
+    }
+  } else {
+    await replaceComment({
+      ...commentGeneralOptions(),
+      body: `${title}
 <details>
 <summary>${result.summary}</summary>
 
@@ -73,5 +84,6 @@ ${await examples2Table(result.examples)}
 
 </details>
 `
-  })
+    })
+  }
 }

@@ -25,13 +25,20 @@ async function run(): Promise<void> {
     const result = await parse(jsonPaths)
     core.info(result.summary)
 
-    if (!result.success) {
+    if (
+      !result.success ||
+      core.getBooleanInput('reportOnSuccess', {required: true})
+    ) {
       await reportSummary(result)
     }
 
-    if (core.getInput('comment') === 'true' && github.context.issue.number) {
+    if (
+      core.getBooleanInput('comment', {required: true}) &&
+      github.context.issue.number
+    ) {
       await reportComment(result)
     }
+
     if (github.context.issue.number) {
       await reportProfileComment(result)
     }

@@ -28,6 +28,10 @@ inputs:
     description: "Title for profile"
     default: "# Slowest examples"
     required: false
+  reportOnSuccess:
+    description: "Add report even if all examples passed"
+    default: "false"
+    required: false
 runs:
   using: "node20"
   main: "dist/index.js"
