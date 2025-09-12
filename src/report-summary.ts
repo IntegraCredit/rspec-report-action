@@ -4,7 +4,7 @@ import type {RspecResult} from './parse'
 
 const FOOTER_LINK =
   // eslint-disable-next-line i18n-text/no-en
-  'Reported by [rspec-report-action](https://github.com/SonicGarden/rspec-report-action)'
+  'Reported by [rspec-report-action](https://github.com/IntegraCredit/rspec-report-action)'
 
 const formatMessage = (message: string): string => {
   const lines = message
@@ -36,10 +36,12 @@ export const reportSummary = async (result: RspecResult): Promise<void> => {
 
   const hideFooterLink = core.getInput('hideFooterLink') === 'true'
 
-  await core.summary
-    .addHeading('RSpec Result')
+  const summaryBuilder = core.summary
+    .addHeading('RSpec Result', 2)
     .addRaw(summary)
-    .addTable([
+
+  if (rows.length > 0) {
+    summaryBuilder.addTable([
       [
         {data: 'Example :link:', header: true},
         {data: 'Description :pencil2:', header: true},
@@ -47,6 +49,10 @@ export const reportSummary = async (result: RspecResult): Promise<void> => {
       ],
       ...rows
     ])
-    .addRaw(hideFooterLink ? '' : `\n${FOOTER_LINK}`)
-    .write()
+  }
+
+  if (!hideFooterLink) {
+    summaryBuilder.addEOL().addRaw(`\n\n${FOOTER_LINK}`)
+  }
+  await summaryBuilder.write()
 }
