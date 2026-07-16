@@ -11,7 +11,9 @@
     "lint": "eslint src/**/*.ts",
     "package": "npx ncc build src/main.ts -o dist --source-map --license licenses.txt",
     "test": "jest",
-    "all": "pnpm run build && pnpm run format && pnpm run lint && pnpm run package && pnpm test"
+    "all": "pnpm run build && pnpm run format && pnpm run lint && pnpm run package && pnpm test",
+    "test:docker": "./script/dockerruntests",
+    "ci:docker": "./script/dockerruntests pnpm run all"
   },
   "repository": {
     "type": "git",

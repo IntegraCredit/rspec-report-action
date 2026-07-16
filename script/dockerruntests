@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+set -eu
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+IMAGE_TAG="${IMAGE_TAG:-rspec-report-action-test:local}"
+DOCKERFILE_PATH="${DOCKERFILE_PATH:-$REPO_ROOT/Dockerfile.test}"
+
+docker build \
+  --file "$DOCKERFILE_PATH" \
+  --tag "$IMAGE_TAG" \
+  "$REPO_ROOT"
+
+docker run --rm -it "$IMAGE_TAG" "$@"

@@ -100,3 +100,26 @@ jobs:
         with:
           json-path: /tmp/json-reports/rspec_results-*.json
 ```
+
+## Containerized Test Runner
+
+Run tests in a Docker container instead of relying on local Node/pnpm setup.
+
+```bash
+pnpm run test:docker
+```
+
+The orchestrator script is [script/dockerruntests](script/dockerruntests) and supports running multiple phases in order, so it can be extended for lint/build/package checks.
+
+```bash
+./script/dockerruntests
+./script/dockerruntests pnpm run lint
+./script/dockerruntests bash
+```
+
+Behavior:
+
+- Always builds the Docker test image first.
+- With no arguments, runs image `CMD` (tests) and exits.
+- With arguments, runs them as the Docker command override (`docker run ... "$@"`).
+- For shell access, pass `bash` (runs with `-it`).
