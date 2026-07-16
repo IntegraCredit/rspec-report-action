@@ -7,8 +7,10 @@ import replaceComment from '@aki77/actions-replace-comment'
 export async function examples2Table(
   examples: RspecResult['slowExamples']
 ): Promise<string> {
-  const {markdownTable} = await import('markdown-table')
-
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const {markdownTable} = require('markdown-table') as {
+    markdownTable: (table: Array<Array<string>>) => string
+  }
   return markdownTable([
     ['Example', 'Description', 'Time in seconds'],
     ...examples.map(({filePath, lineNumber, description, runTime}) => [
