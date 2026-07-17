@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+set -eu
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+IMAGE_TAG="${IMAGE_TAG:-rspec-report-action-test:local}"
+DOCKERFILE_PATH="${DOCKERFILE_PATH:-$REPO_ROOT/Dockerfile.test}"
+
+echo "--- Building image $IMAGE_TAG from $DOCKERFILE_PATH ---"
+
+docker build \
+  --file "$DOCKERFILE_PATH" \
+  --tag "$IMAGE_TAG" \
+  "$REPO_ROOT"
+
+# Run the command if specified as argument, otherwise tests
+RUN_CMD="$*"
+RUN_CMD="${RUN_CMD:-pnpm test}"
+
+echo "--- Running in container with project root ($REPO_ROOT) volume-mounted at /work ---"
+echo "--- But using node_modules directory in image (/work/node_modules) ---"
+
+echo "--- Installing dependencies before executing command ---"
+
+echo "--- Executing command: $RUN_CMD ---"
+
+docker run --rm -it \
+  --volume "$REPO_ROOT:/work" \
+  --volume /work/node_modules \
+  "$IMAGE_TAG" sh -c "pnpm install --frozen-lockfile && $RUN_CMD"

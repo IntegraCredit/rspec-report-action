@@ -12,8 +12,9 @@
     "package": "npx ncc build src/main.ts -o dist --source-map --license licenses.txt",
     "test": "jest",
     "all": "pnpm run build && pnpm run format && pnpm run lint && pnpm run package && pnpm test",
-    "test:docker": "./script/dockerruntests",
-    "ci:docker": "./script/dockerruntests pnpm run all"
+    "test:docker": "./script/dockerrun",
+    "build:docker": "./script/dockerrun pnpm run package",
+    "all:docker": "./script/dockerrun pnpm run all"
   },
   "repository": {
     "type": "git",

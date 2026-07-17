@@ -4,7 +4,9 @@ Generates RSpec failure reporting in GitHub Actions.
 
 This repository was cloned from [SonicGarden/rspec-report-action](https://github.com/SonicGarden/rspec-report-action) and is maintained for internal use and security requirements.
 
-> Note: GitHub Actions (CI/CD) workflows for this repository are not currently running.
+> :bangbang: GitHub Actions (CI/CD) workflows for this repository are not
+> currently running and the `test.yml` workflow file is a remnant from original
+> clone.
 
 ## What It Does
 
@@ -61,23 +63,45 @@ jobs:
           reportOnSuccess: ${{ inputs.report_on_success && 'true' || 'false' }}
 ```
 
-## Containerized Test Runner
+## Containerized Development Environment
 
-Run project checks in Docker instead of relying on local Node/pnpm setup.
+Run project checks in Docker instead of relying on local Node/pnpm setup. The container uses the same Node 24 runtime as the published action.
 
-```bash
-pnpm run test:docker
-```
-
-The orchestration script is [script/dockerruntests](script/dockerruntests).
+The orchestration script is [script/dockerrun](script/dockerrun).
 
 ```bash
-./script/dockerruntests
-./script/dockerruntests pnpm run lint
-./script/dockerruntests bash
+./script/dockerrun              # runs pnpm test (default)
+./script/dockerrun pnpm run all # build + format + lint + package + test
+./script/dockerrun bash         # interactive shell access
 ```
 
-- Always builds the Docker test image first.
-- With no arguments, runs image `CMD` and exits.
-- With arguments, uses them as Docker command override.
-- Pass `bash` for interactive shell access.
+- Always builds the Docker image first.
+- Volume-mounts the project root into the container so build output (e.g. `dist/`) lands on the host filesystem.
+- Installs dependencies inside the container before running the command.
+- With no arguments, runs `pnpm test`.
+- With arguments, runs them as the command.
+- Script exit code is always the exit code of the container command.
+
+### Building for Release
+
+To build the distributable `dist/` bundle for release, run:
+
+```bash
+./script/dockerrun pnpm run package
+```
+
+This compiles the TypeScript source and bundles it with `ncc` into `dist/index.js`, which is what GitHub Actions executes at runtime. The resulting `dist/` changes should be committed.
+
+To run the full pipeline (build, format, lint, package, and test):
+
+```bash
+./script/dockerrun pnpm run all
+```
+
+### npm Script Shortcuts
+
+| Script | Command |
+| - | - |
+| `pnpm run test:docker` | `./script/dockerrun` (tests only) |
+| `pnpm run build:docker` | `./script/dockerrun pnpm run package` |
+| `pnpm run all:docker` | `./script/dockerrun pnpm run all` |
