@@ -7,6 +7,8 @@ module.exports = {
     '\\.jsx?$': 'babel-jest',
     '^.+\\.ts$': 'ts-jest'
   },
-  transformIgnorePatterns: ['/node_modules/(?!markdown-table).+\\.js'],
+  transformIgnorePatterns: [
+    '/node_modules/(?!((\\.pnpm/)?markdown-table(@|/))).+\\.js'
+  ],
   verbose: true
 }

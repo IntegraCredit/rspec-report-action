@@ -44,7 +44,8 @@ const truncate = (str, maxLength) => {
     return str.length > maxLength ? `${str.slice(0, maxLength)}...` : str;
 };
 async function examples2Table(examples) {
-    const { markdownTable } = await import('markdown-table');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+    const { markdownTable } = require('markdown-table');
     const baseUrl = `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/blob/${github.context.sha}`;
     return markdownTable([
         ['Example', 'Description', 'Message'],

@@ -13,7 +13,10 @@ const truncate = (str: string, maxLength: number): string => {
 export async function examples2Table(
   examples: RspecResult['examples']
 ): Promise<string> {
-  const {markdownTable} = await import('markdown-table')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+  const {markdownTable} = require('markdown-table') as {
+    markdownTable: (table: string[][]) => string
+  }
   const baseUrl = `${github.context.serverUrl}/${github.context.repo.owner}/${github.context.repo.repo}/blob/${github.context.sha}`
 
   return markdownTable([

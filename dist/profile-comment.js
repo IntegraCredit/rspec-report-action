@@ -43,7 +43,8 @@ const github = __importStar(require("@actions/github"));
 const util_1 = require("./util");
 const actions_replace_comment_1 = __importDefault(require("@aki77/actions-replace-comment"));
 async function examples2Table(examples) {
-    const { markdownTable } = await import('markdown-table');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+    const { markdownTable } = require('markdown-table');
     return markdownTable([
         ['Example', 'Description', 'Time in seconds'],
         ...examples.map(({ filePath, lineNumber, description, runTime }) => [
