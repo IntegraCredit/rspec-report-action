@@ -115,4 +115,93 @@ describe('reportComment', () => {
       })
     )
   })
+
+  test('sanitizes multi-line descriptions and pipe characters so the table stays well-formed', async () => {
+    const result = {
+      success: false,
+      summary: '1 failure',
+      examples: [
+        {
+          filePath: 'spec/foo.rb',
+          lineNumber: 42,
+          description:
+            'An existing customer navigates\nto another customer | token URL.\nThis should NOT happen.',
+          message: 'expected: true, got: false'
+        }
+      ],
+      slowExamples: [],
+      totalTime: 1.23
+    }
+    await reportComment(result)
+
+    const [{body}] = mockedReplaceComment.mock.calls[0]
+    // The table must not contain any raw newlines or unescaped pipes within a
+    // row, otherwise GitHub renders a broken table. Every line that isn't
+    // itself blank should be a proper "| ... | ... |" table row.
+    const tableRows = (body as string)
+      .split('\n')
+      .filter(line => line.startsWith('|'))
+    expect(tableRows).toHaveLength(3) // header row, alignment row, one data row
+    expect(tableRows[2]).toContain('to another customer \\| token URL.')
+    expect(tableRows[2]).not.toMatch(/navigates\n/)
+  })
+
+  test('preserves paragraph breaks in multi-line descriptions as <br><br>', async () => {
+    const result = {
+      success: false,
+      summary: '1 failure',
+      examples: [
+        {
+          filePath: 'spec/foo.rb',
+          lineNumber: 42,
+          description:
+            'First paragraph line one\nline two.\n\nSecond paragraph.\n\nThird paragraph.',
+          message: 'expected: true, got: false'
+        }
+      ],
+      slowExamples: [],
+      totalTime: 1.23
+    }
+    await reportComment(result)
+
+    const [{body}] = mockedReplaceComment.mock.calls[0]
+    const tableRows = (body as string)
+      .split('\n')
+      .filter(line => line.startsWith('|'))
+    expect(tableRows).toHaveLength(3)
+    // Hard-wrapped single newline within a paragraph collapses to a space...
+    expect(tableRows[2]).toContain('First paragraph line one line two.')
+    // ...while blank-line paragraph breaks become <br><br>.
+    expect(tableRows[2]).toContain(
+      'First paragraph line one line two.<br><br>Second paragraph.<br><br>Third paragraph.'
+    )
+  })
+
+  test('renders bullet lines as an actual <ul><li> list instead of inline dashes', async () => {
+    const result = {
+      success: false,
+      summary: '1 failure',
+      examples: [
+        {
+          filePath: 'spec/foo.rb',
+          lineNumber: 42,
+          description:
+            'Expected behavior (once fixed):\n  - Customer B should NOT receive an LA.\n  - The system should reject the token.',
+          message: 'expected: true, got: false'
+        }
+      ],
+      slowExamples: [],
+      totalTime: 1.23
+    }
+    await reportComment(result)
+
+    const [{body}] = mockedReplaceComment.mock.calls[0]
+    const tableRows = (body as string)
+      .split('\n')
+      .filter(line => line.startsWith('|'))
+    expect(tableRows).toHaveLength(3)
+    expect(tableRows[2]).toContain(
+      'Expected behavior (once fixed): <ul><li>Customer B should NOT receive an LA.</li><li>The system should reject the token.</li></ul>'
+    )
+  })
 })
