@@ -143,7 +143,7 @@ describe('reportComment', () => {
       .filter(line => line.startsWith('|'))
     expect(tableRows).toHaveLength(3) // header row, alignment row, one data row
     expect(tableRows[2]).toContain('to another customer \\| token URL.')
-    expect(tableRows[2]).not.toMatch(/navigates\n/)
+    expect(body as string).not.toContain('navigates\nto')
   })
 
   test('preserves paragraph breaks in multi-line descriptions as <br><br>', async () => {

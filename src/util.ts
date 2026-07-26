@@ -5,6 +5,9 @@ export const floor = (n: number, ndigits: number): number => {
 
 const BULLET_LINE = /^[-*•]\s+/
 
+const escapeHtml = (str: string): string =>
+  str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
 // Within a single paragraph, render any `- item` / `* item` / `• item` lines
 // as a real `<ul><li>` list (GitHub renders raw HTML inside table cells) and
 // join any remaining prose lines with spaces, preserving the order they
@@ -28,7 +31,7 @@ const renderParagraph = (paragraph: string): string => {
   const flushBullets = (): void => {
     if (bullets.length > 0) {
       const items = bullets
-        .map(line => `<li>${line.replace(BULLET_LINE, '')}</li>`)
+        .map(line => `<li>${escapeHtml(line.replace(BULLET_LINE, ''))}</li>`)
         .join('')
       segments.push(`<ul>${items}</ul>`)
       bullets = []
@@ -41,7 +44,7 @@ const renderParagraph = (paragraph: string): string => {
       bullets.push(line)
     } else {
       flushBullets()
-      prose.push(line)
+      prose.push(escapeHtml(line))
     }
   }
   flushProse()
@@ -64,6 +67,7 @@ const renderParagraph = (paragraph: string): string => {
 // lines are rendered as an actual `<ul><li>` list instead of inline dashes.
 export const sanitizeCell = (str: string): string => {
   return str
+    .replace(/\r\n/g, '\n')
     .replace(/\|/g, '\\|')
     .split(/\n[ \t]*\n+/)
     .map(renderParagraph)
