@@ -37,6 +37,7 @@ exports.reportComment = void 0;
 exports.examples2Table = examples2Table;
 const core = __importStar(require("@actions/core"));
 const github = __importStar(require("@actions/github"));
+const util_1 = require("./util");
 const actions_replace_comment_1 = __importStar(require("@aki77/actions-replace-comment"));
 const MAX_TABLE_ROWS = 20;
 const MAX_MESSAGE_LENGTH = 200;
@@ -53,11 +54,8 @@ async function examples2Table(examples) {
             .slice(0, MAX_TABLE_ROWS)
             .map(({ filePath, lineNumber, description, message }) => [
             `[${filePath}:${lineNumber}](${baseUrl}/${filePath}#L${lineNumber})`,
-            description,
-            truncate(message, MAX_MESSAGE_LENGTH)
-                .replace(/\\n/g, ' ')
-                .trim()
-                .replace(/\s+/g, '&nbsp;')
+            (0, util_1.sanitizeCell)(description),
+            (0, util_1.sanitizeCell)(truncate(message, MAX_MESSAGE_LENGTH).replace(/\\n/g, ' ')).replace(/\s+/g, '&nbsp;')
         ])
     ]);
 }

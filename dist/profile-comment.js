@@ -49,7 +49,7 @@ async function examples2Table(examples) {
         ['Example', 'Description', 'Time in seconds'],
         ...examples.map(({ filePath, lineNumber, description, runTime }) => [
             [filePath, lineNumber].join(':'),
-            description,
+            (0, util_1.sanitizeCell)(description),
             String((0, util_1.floor)(runTime, 5))
         ])
     ]);

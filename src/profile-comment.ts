@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import type {RspecResult} from './parse'
-import {floor} from './util'
+import {floor, sanitizeCell} from './util'
 import replaceComment from '@aki77/actions-replace-comment'
 
 export async function examples2Table(
@@ -15,7 +15,7 @@ export async function examples2Table(
     ['Example', 'Description', 'Time in seconds'],
     ...examples.map(({filePath, lineNumber, description, runTime}) => [
       [filePath, lineNumber].join(':'),
-      description,
+      sanitizeCell(description),
       String(floor(runTime, 5))
     ])
   ])

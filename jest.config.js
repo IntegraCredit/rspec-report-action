@@ -5,7 +5,14 @@ module.exports = {
   testMatch: ['**/*.test.ts'],
   transform: {
     '\\.jsx?$': 'babel-jest',
-    '^.+\\.ts$': 'ts-jest'
+    '^.+\\.ts$': [
+      'ts-jest',
+      {
+        tsconfig: {
+          isolatedModules: true
+        }
+      }
+    ]
   },
   transformIgnorePatterns: [
     '/node_modules/(?!((\\.pnpm/)?markdown-table(@|/))).+\\.js'
