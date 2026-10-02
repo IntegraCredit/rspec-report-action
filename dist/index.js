@@ -62096,7 +62096,8 @@ async function run() {
             github.context.issue.number) {
             await (0, report_comment_1.reportComment)(result);
         }
-        if (github.context.issue.number) {
+        if (core.getBooleanInput('reportProfile', { required: true }) &&
+            github.context.issue.number) {
             await (0, profile_comment_1.reportProfileComment)(result);
         }
     }

@@ -39,7 +39,10 @@ async function run(): Promise<void> {
       await reportComment(result)
     }
 
-    if (github.context.issue.number) {
+    if (
+      core.getBooleanInput('reportProfile', {required: true}) &&
+      github.context.issue.number
+    ) {
       await reportProfileComment(result)
     }
   } catch (error) {
