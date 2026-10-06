@@ -28,6 +28,10 @@ inputs:
     description: "Title for profile"
     default: "# Slowest examples"
     required: false
+  reportProfile:
+    description: "Set this to false to skip the slowest examples comment on the pull request"
+    default: "true"
+    required: false
   reportOnSuccess:
     description: "Add report even if all examples passed"
     default: "false"

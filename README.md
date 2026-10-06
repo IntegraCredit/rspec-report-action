@@ -13,7 +13,7 @@ This repository was cloned from [SonicGarden/rspec-report-action](https://github
 - Parses one or more RSpec JSON result files (glob supported).
 - Writes a Job Summary report.
 - Optionally writes a PR failure/success summary comment.
-- Writes a PR slowest-examples profile comment when running in PR context.
+- Optionally writes a PR slowest-examples profile comment when running in PR context.
 
 ## Inputs
 
@@ -27,6 +27,7 @@ Source of truth: [action.yml](action.yml).
 | `hideFooterLink` | Hides footer link in Job Summary when `true`. | `false` | no |
 | `comment` | Enables summary/failure PR comment behavior when `true`. | `true` | no |
 | `profileTitle` | Heading for slowest-examples PR profile comment. | `# Slowest examples` | no |
+| `reportProfile` | Enables the slowest-examples PR profile comment when `true`. | `true` | no |
 | `reportOnSuccess` | Emits success summary output when all examples pass. | `false` | no |
 
 ## Behavior Details
@@ -34,7 +35,7 @@ Source of truth: [action.yml](action.yml).
 - `json-path` is required.
 - Job Summary is written when there are failures, or when `reportOnSuccess: true`.
 - PR summary/failure comments are written only when both `comment: true` and PR context exists.
-- PR profile comment is written whenever PR context exists.
+- PR profile comment is written only when both `reportProfile: true` and PR context exists.
 
 ## Basic Usage
 
